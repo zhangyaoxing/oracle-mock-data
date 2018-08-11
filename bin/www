@@ -7,6 +7,8 @@
 var app = require('../app');
 var debug = require('debug')('oracle-mock-data:server');
 var http = require('http');
+var oracledb = require('oracledb');
+var config = require('config');
 
 /**
  * Get port from environment and store in Express.
@@ -24,10 +26,12 @@ var server = http.createServer(app);
 /**
  * Listen on provided port, on all network interfaces.
  */
-
-server.listen(port);
-server.on('error', onError);
-server.on('listening', onListening);
+getOracleConn(function(err, pool) {
+  app.set('pool', pool);
+  server.listen(port);
+  server.on('error', onError);
+  server.on('listening', onListening);
+});
 
 /**
  * Normalize a port into a number, string, or false.
@@ -87,4 +91,13 @@ function onListening() {
     ? 'pipe ' + addr
     : 'port ' + addr.port;
   debug('Listening on ' + bind);
+}
+
+function getOracleConn(callback) {
+  oracledb.createPool({
+    user: config.database.user,
+    password: config.database.password,
+    database: config.database.database,
+    connectString: config.database.connString
+  }, callback);
 }
