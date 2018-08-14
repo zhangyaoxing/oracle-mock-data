@@ -39,17 +39,20 @@ router.get('/', function (req, res, next) {
           });
           return;
         }
-        let sql = `INSERT INTO TAPDATA.ORDER_LINES VALUES(TAPDATA.OLSEQ.nextval, :orderid, :product, :sku, :qty, :price)`;
+        let sql = `INSERT INTO TAPDATA.ORDER_LINES VALUES(TAPDATA.OLSEQ.nextval, :orderid, :product, :sku, :qty, :price, :crap)`;
         let totalLines = 250 + faker.random.number(100);
         let binds = []
         for(let i = 0; i < totalLines; i++) {
-          binds.push({
+          let doc = {
             orderid: orderId,
             product: faker.commerce.productName(),
             sku: faker.random.number(10000).toString(),
             qty: faker.random.number(100),
             price: faker.commerce.price()
-          });
+          };
+          let crapLoad = config.app.crapLoad - 4 - doc.product.length - doc.sku.length - 4 - 4;
+          doc.crap = randomString(crapLoad);
+          binds.push(doc);
         }
         conn.executeMany(sql, binds, {
           autoCommit: true
@@ -67,10 +70,20 @@ router.get('/', function (req, res, next) {
               ok: 1
             });
           }));
-        })
+        });
       });
     });
   });
 });
+
+function randomString(length) {
+  var text = "";
+  var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+  for (var i = 0; i < length; i++)
+    text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+  return text;
+}
 
 module.exports = router;
