@@ -7,6 +7,13 @@ var router = express.Router();
 router.get('/', function (req, res, next) {
   let pool = req.app.get('pool');
   pool.getConnection((err, conn) => {
+    if (err) {
+      res.status(500);
+      res.json({
+        err: err
+      });
+      return;
+    }
     conn.execute(`SELECT TAPDATA.TAPSEQ.nextval FROM DUAL`, {}, {
       autoCommit: true
     }, (err, result) => {
