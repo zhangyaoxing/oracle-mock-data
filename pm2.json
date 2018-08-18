@@ -1,0 +1,12 @@
+{
+    "apps" : [{
+      "name"        : "oracle-mock-data",
+      "script"      : "bin/www",
+      "watch"       : true,
+      "merge_logs"  : true,
+      "instances"   : 16,
+      "env": {
+          "NODE_ENV": "production"
+      }
+    }]
+}
