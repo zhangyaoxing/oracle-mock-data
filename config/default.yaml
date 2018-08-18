@@ -3,6 +3,10 @@ database:
   password: TAPDATA
   database: TAPDATA
   connString: 192.168.0.161:2521/XE
+mongodb: mongodb://127.0.0.1:27017/mock
 app:
   totalUsers: 10000
   crapLoad: 1000
+mock:
+  lines: 250
+  random: 100

@@ -9,6 +9,7 @@ var debug = require('debug')('oracle-mock-data:server');
 var http = require('http');
 var oracledb = require('oracledb');
 var config = require('config');
+var MongoClient = require('mongodb').MongoClient;
 
 /**
  * Get port from environment and store in Express.
@@ -27,10 +28,21 @@ var server = http.createServer(app);
  * Listen on provided port, on all network interfaces.
  */
 getOracleConn(function(err, pool) {
+  if (err) {
+    console.error(err);
+    return;
+  }
   app.set('pool', pool);
-  server.listen(port);
-  server.on('error', onError);
-  server.on('listening', onListening);
+  getMongoClient(function(err, client) {
+    if (err) {
+      console.error(err);
+      return;
+    }
+    app.set('client', client);
+    server.listen(port);
+    server.on('error', onError);
+    server.on('listening', onListening);
+  });
 });
 
 /**
@@ -99,5 +111,11 @@ function getOracleConn(callback) {
     password: config.database.password,
     database: config.database.database,
     connectString: config.database.connString
+  }, callback);
+}
+
+function getMongoClient(callback) {
+  MongoClient.connect(config.mongodb, {
+    useNewUrlParser: true 
   }, callback);
 }
